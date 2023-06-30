@@ -47,6 +47,7 @@ function SelectedMovie({
   function handleAddWatched() {
     onAddToWatched({ ...movie, userRating: userRating });
     onGoBack();
+    
   }
 
   useEffect(() => {

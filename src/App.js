@@ -7,7 +7,6 @@ import Results from "./Results";
 import MoviesList from "./MoviesList";
 import WatchedList from "./WatchedList";
 import Summary from "./Summary";
-import tempWatchedData from "./TempWatchData";
 import Box from "./Box";
 import Loader from "./Loader";
 import ErrorMessage from "./ErrorMessage";
@@ -19,10 +18,34 @@ const key = "dcb4ad80";
 export default function App() {
   const [query, setQuery] = useState("");
   const [movies, setMovies] = useState(tempMovieData);
-  const [watched, setWatched] = useState([]);
+  const [watched, setWatched] = useState(() => {
+    if (localStorage.getItem("movies"))
+      return JSON.parse(localStorage.getItem("movies"));
+    return [];
+  });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [selectedId, setSelectedId] = useState(null);
+
+  function handleAddToWatch(movie) {
+    setWatched((prev) => [...prev, movie]);
+  }
+
+  function checkIfMovieAdded(movieId) {
+    if (watched.find((mov) => mov.imdbID === movieId)) {
+      return true;
+    }
+    return false;
+  }
+
+  function handleRemoveWatchedMovie(movieId) {
+    setWatched((prev) => prev.filter((mov) => mov.imdbID !== movieId));
+  }
+
+  useEffect(() => {
+    localStorage.setItem("movies", JSON.stringify([...watched]));
+    // if (watched.length === 0) localStorage.removeItem('movies')
+  }, [watched]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -61,21 +84,6 @@ export default function App() {
       controller.abort();
     };
   }, [query]);
-
-  function handleAddToWatch(movie) {
-    setWatched((prev) => [...prev, movie]);
-  }
-
-  function checkIfMovieAdded(movieId) {
-    if (watched.find((mov) => mov.imdbID === movieId)) {
-      return true;
-    }
-    return false;
-  }
-
-  function handleRemoveWatchedMovie(movieId) {
-    setWatched((prev) => prev.filter((mov) => mov.imdbID !== movieId));
-  }
 
   return (
     <>
